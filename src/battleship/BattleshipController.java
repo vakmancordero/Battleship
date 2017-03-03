@@ -15,12 +15,17 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.scene.Node;
 
 import battleship.beans.ElementButton;
 import battleship.beans.Player;
-import battleship.rmi.Client;
-import java.rmi.RemoteException;
+import battleship.beans.Position;
 
+import battleship.rmi.Client;
+
+import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.Optional;
 
 /**
@@ -30,19 +35,21 @@ import java.util.Optional;
 public class BattleshipController implements Initializable {
     
     @FXML
-    private GridPane gameBoardGrid;
+    private GridPane gameBoardGrid, gameBoardTarget;
     
     public static final int MAX_ELEMENTS = 8;
-    
     private int counter;
-    
     private Client client;
+    private Player player;
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         this.initGameBoard();
         this.client = new Client();
         this.counter = 0;
+        
+        this.player = new Player();
+        this.player.setName(new Date().toString());
     }
     
     private void initGameBoard() {
@@ -59,7 +66,22 @@ public class BattleshipController implements Initializable {
                 
                 ElementButton element = new ElementButton("empty");
                 
+                ElementButton elementTarget = new ElementButton("empty");
+                
                 this.gameBoardGrid.add(element, i, j);
+                this.gameBoardTarget.add(elementTarget, i, j);
+                
+                elementTarget.getElementButton().setOnAction((event) -> {
+                    
+                    try {
+                        
+                        this.shootSpace(event);
+                        
+                    } catch (RemoteException ex) {
+                        
+                    }
+                    
+                });
                 
                 element.getElementButton().setOnAction((event) -> {
                     
@@ -80,12 +102,32 @@ public class BattleshipController implements Initializable {
         
     }
     
-    private void selectSpace(ActionEvent event) throws RemoteException {
+    private void shootSpace(ActionEvent event) throws RemoteException {
         
         ElementButton element = (ElementButton) ((Button) event.getSource()).getParent();
         
         Integer rowIndex = GridPane.getRowIndex(element);
         Integer columnIndex = GridPane.getColumnIndex(element);
+        
+        Position position = new Position(rowIndex, columnIndex);
+        
+        boolean shoot = this.client.shoot(player, position);
+        
+        if (shoot) {
+            
+            element.getElementButton().setStyle("-fx-background-color: yellow;");
+            
+        } else {
+            
+            element.getElementButton().setStyle("-fx-background-color: red;");
+            
+        }
+        
+    }
+    
+    private void selectSpace(ActionEvent event) throws RemoteException {
+        
+        ElementButton element = (ElementButton) ((Button) event.getSource()).getParent();
         
         Button button = element.getElementButton();
         
@@ -122,9 +164,49 @@ public class BattleshipController implements Initializable {
                 
                 if (option.get() == ButtonType.OK) {
                     
+                    ObservableList<Node> children = this.gameBoardGrid.getChildren();
+                    
+                    ArrayList<Position> positions = new ArrayList<>();
+                    
+                    for (Node node : children) {
+                        
+                        String simpleName = node.getClass().getSimpleName();
+                        
+                        if (simpleName.equals("ElementButton")) {
+                            
+                            ElementButton elementButton = (ElementButton) node;
+                            
+                            if (elementButton.isSelected()) {
+                                
+                                Integer rowIndex = GridPane.getRowIndex(node);
+                                Integer columnIndex = GridPane.getColumnIndex(node);
+
+                                positions.add(new Position(rowIndex, columnIndex));
+                                
+                            }
+                            
+                            
+                        }
+                        
+                    }
+                    
                     System.out.println("Comenzando el juego");
                     
-                    this.client.send(new Player("Arturo"));
+                    this.player.setPositions(positions);
+                    
+                    boolean wantToPlay = this.client.wantToPlay(player);
+                    
+                    if (wantToPlay) {
+                        
+                        System.out.println("Has sido logeado");
+                        
+                        new Thread(new Listener()).start();
+                        
+                    } else {
+                        
+                        System.out.println("El servidor está ocupado");
+                        
+                    }
                     
                 }
                 
@@ -132,12 +214,192 @@ public class BattleshipController implements Initializable {
             
         }
         
-        System.out.println(rowIndex + " : " + columnIndex);
-        
     }
     
     private void blockGameBoard(boolean value) {
         this.gameBoardGrid.setDisable(value);
+    }
+    
+    private void start() throws RemoteException {
+        
+        Player player1 = this.client.getPlayer1();
+        
+        if (player1.getName().equals(this.player.getName())) {
+            
+            System.out.println("Soy el primero: " + this.player.getName());
+            
+            this.blockGameBoard(true);
+            
+            this.client.setPlayingPlayer1(true);
+            
+        }
+        
+        new Thread(new TurnListener()).start();
+        
+        new Thread(new Repaint()).start();
+        
+    }
+    
+    private void shoot() throws RemoteException {
+        this.gameBoardTarget.setDisable(false);
+    }
+    
+    class Listener implements Runnable {
+        
+        private boolean running = true;
+        
+        @Override
+        public void run() {
+            
+            while (this.running) {
+                
+                try {
+                    
+                    if (client.isReady()) {
+                        
+                        start();
+                        
+                        break;
+                        
+                    }
+                    
+                    Thread.sleep(1000);
+                    
+                } catch (InterruptedException | RemoteException ex) {
+                    
+                }
+                
+            }
+            
+        }
+
+        public void setIsRunning(boolean value) {
+            this.running = value;
+        }
+        
+    }
+    
+    class TurnListener implements Runnable {
+
+        private boolean running = true;
+        
+        @Override
+        public void run() {
+            
+            while (this.running) {
+                
+                try {
+                    
+                    if (player.getName().equals(client.getPlayer1().getName())) {
+                        
+                        if (client.isPlayingPlayer1()) {
+                            
+                            client.setPlayingPlayer1(false);
+                            
+                            shoot();
+                            
+                        }
+                        
+                    } else {
+                        
+                        if (client.isPlayingPlayer2()) {
+                            
+                            client.setPlayingPlayer2(false);
+                            
+                            //Disparar player2
+                            
+                        }
+                        
+                    }
+                    
+                    Thread.sleep(1000);
+                    
+                } catch (InterruptedException | RemoteException ex) {
+                    
+                }
+                
+            }
+            
+        }
+
+        public void setIsRunning(boolean value) {
+            this.running = value;
+        }
+        
+    }
+    
+    class Repaint implements Runnable {
+
+        private boolean running = true;
+        
+        @Override
+        public void run() {
+            
+            while (this.running) {
+                
+                try {
+                    
+                    try {
+                            
+                        if (player.getName().equals(client.getPlayer1().getName())) {
+
+                            Position positionP2 = client.gettLastShootP2();
+
+                            Node anchorPane = this.getNodeFromGridPane(
+                                    gameBoardGrid, 
+                                    positionP2.getPosX(), positionP2.getPosY()
+                            );
+
+                            ElementButton elementButton = (ElementButton) anchorPane;
+
+                            Button button = elementButton.getElementButton();
+
+                            button.setStyle("-fx-background-color: orange;");
+
+                        } else {
+
+                            Position positionP1 = client.gettLastShootP1();
+
+                            Node anchorPane = this.getNodeFromGridPane(
+                                    gameBoardGrid, 
+                                    positionP1.getPosX(), positionP1.getPosY()
+                            );
+
+                            ElementButton elementButton = (ElementButton) anchorPane;
+
+                            Button button = elementButton.getElementButton();
+
+                            button.setStyle("-fx-background-color: sky;");
+
+                        }
+
+                        Thread.sleep(1000);
+                        
+                    } catch (NullPointerException e) {
+                        
+                    }
+                    
+                } catch (InterruptedException | RemoteException ex) {
+                    
+                }
+                
+            }
+            
+        }
+        
+        private Node getNodeFromGridPane(GridPane gridPane, int col, int row) {
+            for (Node node : gridPane.getChildren()) {
+                if (GridPane.getColumnIndex(node) == col && GridPane.getRowIndex(node) == row) {
+                    return node;
+                }
+            }
+            return null;
+        }
+        
+        public void setIsRunning(boolean value) {
+            this.running = value;
+        }
+        
     }
     
 }

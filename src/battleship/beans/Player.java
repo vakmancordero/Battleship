@@ -1,7 +1,7 @@
 package battleship.beans;
 
 import java.io.Serializable;
-import javafx.scene.layout.GridPane;
+import java.util.ArrayList;
 
 /**
  *
@@ -10,20 +10,19 @@ import javafx.scene.layout.GridPane;
 public class Player implements Serializable {
     
     private String name;
-//    private GridPane gameBoard;
+    private ArrayList<Position> positions, targetPositions;
     
+    private boolean playing = false;
+    private boolean alive = false;
+
     public Player() {
         
     }
     
-    public Player(String name) {
+    public Player(String name, ArrayList<Position> positions) {
         this.name = name;
-//        this.gameBoard = gameBoard;
+        this.positions = positions;
     }
-    
-//    public Player(String name) {
-//        this.name = name;
-//    }
 
     public String getName() {
         return name;
@@ -32,18 +31,42 @@ public class Player implements Serializable {
     public void setName(String name) {
         this.name = name;
     }
+    
+    public ArrayList<Position> getPositions() {
+        return positions;
+    }
+    
+    public void setPositions(ArrayList<Position> positions) {
+        this.positions = positions;
+    }
 
-//    public GridPane getGameBoard() {
-//        return gameBoard;
-//    }
+    public ArrayList<Position> getTargetPositions() {
+        return targetPositions;
+    }
 
-//    public void setGameBoard(GridPane gameBoard) {
-//        this.gameBoard = gameBoard;
-//    }
+    public void setTargetPositions(ArrayList<Position> targetPositions) {
+        this.targetPositions = targetPositions;
+    }
+
+    public boolean isPlaying() {
+        return playing;
+    }
+
+    public void setPlaying(boolean playing) {
+        this.playing = playing;
+    }
+
+    public boolean isAlive() {
+        return alive;
+    }
+
+    public void setAlive(boolean alive) {
+        this.alive = alive;
+    }
     
     @Override
     public String toString() {
-        return this.name;
+        return this.name + " : " + this.positions.toString();
     }
     
 }
