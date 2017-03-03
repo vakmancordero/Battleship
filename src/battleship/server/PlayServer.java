@@ -23,6 +23,7 @@ public class PlayServer {
             
         } catch (RemoteException ex) {
             
+            System.out.println("Error: " + ex.toString());
             
         }
         

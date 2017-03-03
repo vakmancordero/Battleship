@@ -124,7 +124,7 @@ public class BattleshipController implements Initializable {
                     
                     System.out.println("Comenzando el juego");
                     
-                    this.client.send(new Player("Arturo", this.gameBoardGrid));
+                    this.client.send(new Player("Arturo"));
                     
                 }
                 
