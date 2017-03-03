@@ -24,5 +24,7 @@ public interface Environment extends Remote {
     public void setLastShootP2(Position position) throws RemoteException;
     public Position gettLastShootP1() throws RemoteException;
     public Position gettLastShootP2() throws RemoteException;
+    public void giveUp() throws RemoteException;
+    public boolean getgiveUp() throws RemoteException;
     
 }

@@ -14,6 +14,9 @@ public class Player implements Serializable {
     
     private boolean playing = false;
     private boolean alive = false;
+    private boolean lose = false;
+    
+    private int point=0;
 
     public Player() {
         
@@ -62,6 +65,22 @@ public class Player implements Serializable {
 
     public void setAlive(boolean alive) {
         this.alive = alive;
+    }
+    
+    public void addPoint(){
+        this.point++;
+    }
+    
+    public int getPoint(){
+        return this.point;
+    }
+    
+    public void setLoser(){
+        this.lose=lose;
+    }
+    
+    public boolean getLose(){
+        return this.lose;
     }
     
     @Override

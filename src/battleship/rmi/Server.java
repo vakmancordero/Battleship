@@ -17,6 +17,8 @@ public class Server extends UnicastRemoteObject implements Environment {
     
     private Position lastShootP1, lastShootP2;
     
+    private boolean win = false;
+    
     public Server() throws RemoteException {
         super();
         
@@ -151,6 +153,16 @@ public class Server extends UnicastRemoteObject implements Environment {
     @Override
     public Position gettLastShootP2() throws RemoteException {
         return this.lastShootP2;
+    }
+    
+    @Override
+    public void giveUp() throws RemoteException {
+        this.win=true;
+    }
+
+    @Override
+    public boolean getgiveUp() throws RemoteException {
+        return win;
     }
     
 }

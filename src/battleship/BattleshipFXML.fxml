@@ -94,5 +94,35 @@
             </AnchorPane>
         </items>
       </SplitPane>
+      <Label layoutX="289.0" layoutY="418.0" text="Jugador:">
+         <font>
+            <Font name="Roboto Mono Light for Powerline" size="24.0" />
+         </font>
+      </Label>
+      <Label layoutX="304.0" layoutY="457.0" text="Estado:">
+         <font>
+            <Font name="Roboto Mono Light for Powerline" size="24.0" />
+         </font>
+      </Label>
+      <Label fx:id="lblPlayer" layoutX="414.0" layoutY="418.0" text="-">
+         <font>
+            <Font name="Roboto Mono Light for Powerline" size="24.0" />
+         </font>
+      </Label>
+      <Label fx:id="lblEstado" layoutX="414.0" layoutY="457.0" text="-" textAlignment="CENTER">
+         <font>
+            <Font name="Roboto Mono Light for Powerline" size="24.0" />
+         </font>
+      </Label>
+      <Label layoutX="600.0" layoutY="433.0" text="Puntos:">
+         <font>
+            <Font name="Roboto Mono Light for Powerline" size="24.0" />
+         </font>
+      </Label>
+      <Label fx:id="lblScore" layoutX="701.0" layoutY="433.0">
+         <font>
+            <Font name="Roboto Mono Light for Powerline" size="24.0" />
+         </font>
+      </Label>
    </children>
 </AnchorPane>

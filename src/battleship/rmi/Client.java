@@ -62,7 +62,7 @@ public class Client {
     }
     
     public void setPlayingPlayer2(boolean value) throws RemoteException {
-        this.environment.setPlayingPlayer1(value);
+        this.environment.setPlayingPlayer2(value);
     }
     
     public boolean isPlayingPlayer1() throws RemoteException {
@@ -91,6 +91,14 @@ public class Client {
 
     public Position gettLastShootP2() throws RemoteException {
         return this.environment.gettLastShootP2();
+    }
+    
+    public void giveUp() throws RemoteException {
+        this.environment.giveUp();
+    }
+    
+    public boolean getgiveUp() throws RemoteException {
+        return this.environment.getgiveUp();
     }
     
 }
