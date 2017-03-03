@@ -27,6 +27,7 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Optional;
+import javafx.application.Platform;
 import javafx.scene.control.Label;
 
 /**
@@ -39,7 +40,7 @@ public class BattleshipController implements Initializable {
     private GridPane gameBoardGrid, gameBoardTarget;
     
     @FXML
-    public Label lblEstado, lblPlayer, lblScore;
+    private Label lblEstado, lblPlayer, lblScore;
     
     public static final int MAX_ELEMENTS = 8;
     private int counter;
@@ -54,6 +55,8 @@ public class BattleshipController implements Initializable {
         
         this.player = new Player();
         this.player.setName(new Date().toString());
+        
+        this.lblPlayer.setText(this.player.getName());
         lblScore.setText("0");
     }
     
@@ -69,9 +72,9 @@ public class BattleshipController implements Initializable {
             
             for (int j = 0; j < rows.size(); j++) {
                 
-                ElementButton element = new ElementButton("empty");
+                ElementButton element = new ElementButton("X");
                 
-                ElementButton elementTarget = new ElementButton("empty");
+                ElementButton elementTarget = new ElementButton("0");
                 
                 this.gameBoardGrid.add(element, i, j);
                 this.gameBoardTarget.add(elementTarget, i, j);
@@ -122,7 +125,15 @@ public class BattleshipController implements Initializable {
             
                 //Aumento de puntos
                 player.addPoint();
-                lblScore.setText(""+player.getPoint());
+                
+                
+                Platform.runLater(() -> {
+                    
+                    lblScore.setText(""+player.getPoint());
+                
+                });
+                
+                
 
                 //Consulta de puntos para saber si se rinde
 
@@ -146,7 +157,13 @@ public class BattleshipController implements Initializable {
                     client.setPlayingPlayer1(false);
                     client.setPlayingPlayer2(true);
                     this.gameBoardTarget.setDisable(true);
-                    lblEstado.setText("Esperando");
+                    
+                    Platform.runLater(() -> {
+                    
+                        lblEstado.setText("Esperando");
+                
+                    });
+                    
                     
                 }else{
             
@@ -154,7 +171,13 @@ public class BattleshipController implements Initializable {
                     client.setPlayingPlayer1(true);
                     client.setPlayingPlayer2(false);
                     this.gameBoardTarget.setDisable(true);
-                    lblEstado.setText("Esperando");
+                    
+                    Platform.runLater(() -> {
+                    
+                        lblEstado.setText("Esperando");
+                
+                    });
+                    
                 }
         
     }
@@ -261,16 +284,21 @@ public class BattleshipController implements Initializable {
         if (player1.getName().equals(this.player.getName())) {
             
             System.out.println("Soy el primero: " + this.player.getName());
-            lblEstado.setText("Jugando");
-            lblPlayer.setText(this.player.getName());
+            this.setState("jugando");
+            //this.setName(this.player.getName());
             
             this.blockGameBoard(true);
             
             this.client.setPlayingPlayer1(true);
             
         }else{
-            lblEstado.setText("Esperando");
-            lblPlayer.setText(this.player.getName());
+            
+            Platform.runLater(() -> {
+                    
+                        lblEstado.setText("Esperando");
+                
+                    });
+            //this.setName(this.player.getName());
         }
         
         new Thread(new TurnListener()).start();
@@ -281,6 +309,21 @@ public class BattleshipController implements Initializable {
     
     private void shoot() throws RemoteException {
         this.gameBoardTarget.setDisable(false);
+    }
+
+    private void setName(String name) throws IllegalStateException{
+        
+        
+    }
+
+    private void setState(String jugando) throws IllegalStateException{
+        
+                    Platform.runLater(() -> {
+  
+                        this.lblEstado.setText("Esperando");
+                
+                    });
+        
     }
     
     class Listener implements Runnable {
@@ -315,6 +358,7 @@ public class BattleshipController implements Initializable {
         public void setIsRunning(boolean value) {
             this.running = value;
         }
+       
         
     }
     
@@ -334,8 +378,13 @@ public class BattleshipController implements Initializable {
                     if (player.getName().equals(client.getPlayer1().getName())) {
                         
                         if (client.isPlayingPlayer1()) {
-                            System.out.println("Estoy jugando 111");
+                            //System.out.println("Estoy jugando 111");
+                            
+                            Platform.runLater(() -> {
+  
                             lblEstado.setText("Jugando");
+                
+                            });
                             client.setPlayingPlayer1(false);
                             
                             shoot();
@@ -347,12 +396,16 @@ public class BattleshipController implements Initializable {
                         }
                         
                     } else {
-                        System.out.println("¿Puedo jugar player 2?" + client.isPlayingPlayer2());
+                        //System.out.println("¿Puedo jugar player 2?" + client.isPlayingPlayer2());
                         
                         if (client.isPlayingPlayer2()) {
-                            System.out.println("Estoy jugando 222");
+                            //System.out.println("Estoy jugando 222");
                             client.setPlayingPlayer2(false);
+                             Platform.runLater(() -> {
+  
                             lblEstado.setText("Jugando");
+                
+                            });
                             
                             shoot();
                             
@@ -405,6 +458,9 @@ public class BattleshipController implements Initializable {
                             ElementButton elementButton = (ElementButton) anchorPane;
 
                             Button button = elementButton.getElementButton();
+                            
+                            System.out.println(":v");
+                            
 
                             button.setStyle("-fx-background-color: orange;");
                             
@@ -421,6 +477,8 @@ public class BattleshipController implements Initializable {
                             ElementButton elementButton = (ElementButton) anchorPane;
 
                             Button button = elementButton.getElementButton();
+                            
+                            button.setText(":v");
 
                             button.setStyle("-fx-background-color: sky;");
 
