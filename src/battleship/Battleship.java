@@ -4,6 +4,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 
 /**
@@ -20,6 +21,8 @@ public class Battleship extends Application {
         
         stage.setScene(scene);
         stage.show();
+        
+        new Alert(Alert.AlertType.INFORMATION, "Ingresa tus elementos! :D").show();
     }
 
     /**
