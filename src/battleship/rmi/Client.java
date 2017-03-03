@@ -1,6 +1,7 @@
 package battleship.rmi;
 
 import battleship.beans.Player;
+import battleship.beans.Position;
 import battleship.rmi.impl.Environment;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -26,7 +27,7 @@ public class Client {
         
         try {
             
-            Registry registry = LocateRegistry.getRegistry("192.168.0.8", 1099);
+            Registry registry = LocateRegistry.getRegistry("localhost", 1099);
             
             this.environment = (Environment) registry.lookup("server");
             
@@ -36,15 +37,60 @@ public class Client {
             
             System.out.println("Error: " + ex.toString());
             
+            System.out.println("No hay servidor en ejecución...");
+            
+            System.exit(0);
+            
         }
         
     }
     
-    public void send(Player player) throws RemoteException {
-        
-        System.out.println("Sending");
-        
-        this.environment.setCurrentPlayer(player);
+    public boolean wantToPlay(Player player) throws RemoteException {
+        return this.environment.wantToPlay(player);
+    }
+    
+    public boolean isReady() throws RemoteException {
+        return this.environment.isReady();
+    }
+    
+    public Player getPlayer1() throws RemoteException {
+        return this.environment.getPlayer1();
+    }
+    
+    public void setPlayingPlayer1(boolean value) throws RemoteException {
+        this.environment.setPlayingPlayer1(value);
+    }
+    
+    public void setPlayingPlayer2(boolean value) throws RemoteException {
+        this.environment.setPlayingPlayer1(value);
+    }
+    
+    public boolean isPlayingPlayer1() throws RemoteException {
+        return this.environment.isPlayingPlayer1();
+    }
+
+    public boolean isPlayingPlayer2() throws RemoteException {
+        return this.environment.isPlayingPlayer2();
+    }
+    
+    public boolean shoot(Player player, Position position) throws RemoteException {
+        return this.environment.shoot(player, position);
+    }
+    
+    public void setLastShootP1(Position position) throws RemoteException {
+        this.environment.setLastShootP1(position);
+    }
+
+    public void setLastShootP2(Position position) throws RemoteException {
+        this.environment.setLastShootP2(position);
+    }
+
+    public Position gettLastShootP1() throws RemoteException {
+        return this.environment.gettLastShootP1();
+    }
+
+    public Position gettLastShootP2() throws RemoteException {
+        return this.environment.gettLastShootP2();
     }
     
 }
