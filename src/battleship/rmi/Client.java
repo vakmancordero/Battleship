@@ -16,6 +16,9 @@ public class Client {
     private Environment environment;
     
     public Client() {
+        
+        System.out.println("Connecting");
+        
         this.connectServer();
     }
     
@@ -23,7 +26,7 @@ public class Client {
         
         try {
             
-            Registry registry = LocateRegistry.getRegistry("127.0.0.1", 1099);
+            Registry registry = LocateRegistry.getRegistry("192.168.0.8", 1099);
             
             this.environment = (Environment) registry.lookup("server");
             
@@ -31,11 +34,16 @@ public class Client {
             
         } catch (RemoteException | NotBoundException ex) {
             
+            System.out.println("Error: " + ex.toString());
+            
         }
         
     }
     
     public void send(Player player) throws RemoteException {
+        
+        System.out.println("Sending");
+        
         this.environment.setCurrentPlayer(player);
     }
     
